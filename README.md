@@ -28,17 +28,21 @@ Shoot On the Move ideas for FRC
 
 ## Math
 rd = sqrt(rdx^2+rdy^2)
+
 t = timeCali(rd)
 
 bvx = rdx/t
+
 bvy = rdy/t
 
 nvx = bvx-rvx
+
 nvy = bvy-rvy
 
 nv = sqrt(nvx^2+nvy^2)
+
 thetaT = atan(nvy/nvx)
 
 thetaH = angleCali(rd)
-shooterRPM = speedCali(nv/cos(thetaH))
 
+shooterRPM = speedCali(nv/cos(thetaH))

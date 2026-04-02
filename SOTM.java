@@ -21,13 +21,14 @@ public class SOTM
         double nv = sotm(rdx, rdy, rvx, rvy)[0];
         double thetaT = sotm(rdx, rdy, rvx, rvy)[1];
         double rd = sotm(rdx, rdy, rvx, rvy)[2];
+        double bv = sotm(rdx, rdy, rvx, rvy)[3];
         
         System.out.printf("Robot Distance: %.2f%n",rd);
         System.out.printf("Final Shoot Speed: %.2f%n",nv);
         System.out.printf("Final Shoot Turret Angle: %.2f%n",thetaT*180/Math.PI);
         
-        double shooterRPM = shoot(nv, rd)[0];
-        double thetaH = shoot(nv, rd)[1];
+        double shooterRPM = shoot(nv, rd, bv)[0];
+        double thetaH = shoot(nv, rd, bv)[1];
         
         System.out.printf("Final Shooter RPM: %.2f%n", shooterRPM);
         System.out.printf("Final Hood Angle: %.2f%n", thetaH*180/Math.PI);        
@@ -36,12 +37,11 @@ public class SOTM
     public static double[] sotm(double rdx, double rdy, double rvx, double rvy){        
         double rd=Math.sqrt(rdx*rdx+rdy*rdy);
         double t=timeCali(rd);
-        
-        //System.out.println(t);
-        
+                
         // Ball Velocity Vector
         double bvx = rdx/t;
         double bvy = rdy/t;
+        double bv = Math.sqrt(bvx*bvx+bvy*bvy);
         
         // Summed Velocity Vector
         double nvx = bvx-rvx;
@@ -51,21 +51,20 @@ public class SOTM
         double nv = Math.sqrt(Math.pow(nvx, 2)+Math.pow(nvy, 2));
         double theta2 = Math.atan(nvy/nvx);
         
-        return new double[] {nv, theta2, rd};
+        return new double[] {nv, theta2, rd, bv};
     }
-    public static double[] shoot(double nv, double rd){
+    public static double[] shoot(double nv, double rd, double bv){
         // Calculate Shooter Angle and RPM
         double thetaH1=angleCali(rd); //Determine hood angle
             //System.out.println("ThetaH1: "+thetaH1*180/Math.PI);
-        double bv1=speedCali(rd);
-            //System.out.println("bv1: "+bv1);
-        double bvz = bv1*Math.sin(thetaH1);
+        double bvz = Math.sin(thetaH1);
             //System.out.println("bvz: "+bvz);
-        double bvxy1 = bv1*Math.cos(thetaH1);
-            //System.out.println("bvxy1: "+bvxy1);
+        double bvxy = nv/bv*Math.cos(thetaH1);
+            //System.out.println("bvxy: "+bvxy);
         
-        double thetaH2=Math.atan(bvz/nv);
-        double shooterRPM=rpmCali(Math.sqrt(Math.pow(bvz, 2)+Math.pow(nv, 2)));
+        double thetaH2=Math.atan(bvz/bvxy);
+        
+        double shooterRPM = speedCali(rd)*nv/bv;
         
         return new double[] {shooterRPM, thetaH2};
     }
@@ -77,11 +76,7 @@ public class SOTM
         // Determine Hood Angle in radians based on distance - FAKE
         return Math.PI/2.0-dist*0.05;   
     }
-    public static double speedCali(double rd){
-        // Determine Shooter Speed in m/s based on d - FAKE
-         return rd*0.95;   
-    }
-    public static double rpmCali(double nv){
+    public static double speedCali(double nv){
         // Determine Shooter Speed in rpm based on m/s - FAKE
          return nv*300.0;   
     }

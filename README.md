@@ -10,7 +10,7 @@ Shoot On the Move ideas for FRC
 
 * Time Calibration Curve
 * Hood Angle Calibration Curve
-* Speed to RPM Calibration Curve
+* Distance to RPM Calibration Curve
 
 ## Other Variables
 * Robot Position Vector -> rd
@@ -18,6 +18,10 @@ Shoot On the Move ideas for FRC
 
 * Ball Velocity X -> bvx
 * Ball Velocity Y -> bvy
+* Ball Velocity Z -> bvz
+* Ball Velocity XY -> bvxy
+
+* Original Ball Velocity
 
 * Summed Velocity X -> nvx
 * Summed Velocity Y -> nvy
@@ -43,6 +47,14 @@ nv = sqrt(nvx^2+nvy^2)
 
 thetaT = atan(nvy/nvx)
 
-thetaH = angleCali(rd)
+thetaH1 = angleCali(rd)
 
-shooterRPM = speedCali(nv/cos(thetaH))
+bv1 = speedCali(rd)
+
+bvz = sin(thetaH1)
+
+bvxy = nv/bv*cos(thetaH1)
+
+thetaH2 = atan(bvz/nv)
+
+shooterRPM = speedCali(rd)*nv/bv
